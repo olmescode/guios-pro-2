@@ -8,7 +8,6 @@ DEBUG = os.environ.get("GUIOS_DEBUG", "1") == "1"
 HOSTS = os.environ.get("GUIOS_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS = HOSTS.split(",")
 
-# Render: dirección pública que asigna el servicio (ej. guios-pro.onrender.com)
 HOST_RENDER = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if HOST_RENDER:
     ALLOWED_HOSTS.append(HOST_RENDER)
