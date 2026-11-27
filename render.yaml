@@ -1,0 +1,42 @@
+databases:
+  - name: guios-pro-db
+    plan: free
+    databaseName: guios_pro
+    user: guios
+
+services:
+  - type: web
+    name: guios-pro
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate && gunicorn guios_pro.wsgi:application --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: GUIOS_DEBUG
+        value: "0"
+      - key: GUIOS_SECRET_KEY
+        generateValue: true
+      - key: GUIOS_DB_HOST
+        fromDatabase:
+          name: guios-pro-db
+          property: host
+      - key: GUIOS_DB_PUERTO
+        fromDatabase:
+          name: guios-pro-db
+          property: port
+      - key: GUIOS_DB_NOMBRE
+        fromDatabase:
+          name: guios-pro-db
+          property: database
+      - key: GUIOS_DB_USUARIO
+        fromDatabase:
+          name: guios-pro-db
+          property: user
+      - key: GUIOS_DB_CLAVE
+        fromDatabase:
+          name: guios-pro-db
+          property: password
+      - key: GUIOS_IA_CLAVE
+        sync: false

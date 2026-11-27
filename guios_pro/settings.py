@@ -8,6 +8,13 @@ DEBUG = os.environ.get("GUIOS_DEBUG", "1") == "1"
 HOSTS = os.environ.get("GUIOS_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS = HOSTS.split(",")
 
+# Render: dirección pública que asigna el servicio (ej. guios-pro.onrender.com)
+HOST_RENDER = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if HOST_RENDER:
+    ALLOWED_HOSTS.append(HOST_RENDER)
+    CSRF_TRUSTED_ORIGINS = [f"https://{HOST_RENDER}"]
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -18,6 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -50,8 +58,13 @@ TIME_ZONE = "America/Guayaquil"
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 IA_CLAVE = os.environ.get("GUIOS_IA_CLAVE", "")
-IA_MODELO = os.environ.get("GUIOS_IA_MODELO", "claude-haiku-5-5")
+IA_MODELO = os.environ.get("GUIOS_IA_MODELO", "claude-sonnet-5-5")

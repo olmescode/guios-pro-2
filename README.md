@@ -66,7 +66,7 @@ Python 3.12 o superior, Django 5.2 y PostgreSQL 16.
 | `GUIOS_DB_CLAVE` | vacío | Contraseña de PostgreSQL |
 | `GUIOS_DB_HOST` / `GUIOS_DB_PUERTO` | `localhost` / `5432` | Servidor de la base de datos |
 | `GUIOS_IA_CLAVE` | vacío | Clave de la API de Anthropic; sin ella el sistema funciona con sugerencias automáticas |
-| `GUIOS_IA_MODELO` | `claude-haiku-5-5` | Modelo de lenguaje que se usaría |
+| `GUIOS_IA_MODELO` | `claude-sonnet-5-5` | Modelo de lenguaje que se usaría |
 
 ## Pruebas
 
