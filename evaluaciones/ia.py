@@ -46,8 +46,6 @@ RAZONES = {
 def consultar(instruccion):
     if not settings.IA_CLAVE:
         return {}
-    # Sonnet 5.5 piensa antes de responder: se usa esfuerzo bajo (tareas cortas) y margen de tokens
-    # para que el razonamiento no deje la respuesta cortada.
     cuerpo = json.dumps({"model": settings.IA_MODELO, "max_tokens": 4000, "output_config": {"effort": "low"},
                          "messages": [{"role": "user", "content": instruccion}]})
     cabeceras = {"x-api-key": settings.IA_CLAVE, "anthropic-version": "2023-06-01", "content-type": "application/json"}
@@ -55,7 +53,6 @@ def consultar(instruccion):
     try:
         with urllib.request.urlopen(pedido, timeout=60) as conexion:
             mensaje = json.load(conexion)
-        # La respuesta puede traer primero un bloque de razonamiento; se toma el de texto.
         contenido = "".join(bloque.get("text", "") for bloque in mensaje["content"] if bloque.get("type") == "text")
         return json.loads(contenido[contenido.find("{"):contenido.rfind("}") + 1])
     except Exception:
