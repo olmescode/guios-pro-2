@@ -1,0 +1,42 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<div class="columnas">
+  <section class="tarjeta">
+    <div class="cabecera"><span class="icono-ia">✦</span>
+      <div><h2 style="font-size:19px">Perfil de la organización</h2><p class="mini" style="margin:2px 0 0">El asistente hace unas preguntas para ajustar la Importancia Sugerida a tu caso.</p></div></div>
+    <div class="chat">
+      {% for r in respuestas %}<p>{{ r.pregunta }}</p><p class="yo">{{ r.respuesta }}</p>{% endfor %}
+      {% if siguiente %}<p>{{ siguiente }}</p>{% endif %}
+    </div>
+    {% if siguiente %}
+    <form class="escribir" method="post">{% csrf_token %}
+      <input name="respuesta" placeholder="Escribe aquí..." autofocus required autocomplete="off"><button class="boton">→</button>
+    </form>
+    {% endif %}
+  </section>
+  <aside class="lateral">
+    {% if perfil %}
+    <form method="post" action="{% url 'confirmar_perfil' ev.pk %}">{% csrf_token %}
+      <div class="tarjeta">
+        <h3>Perfil detectado</h3>
+        <p class="mini">Puedes corregir cualquier dato antes de seguir.</p>
+        <div class="rejilla" style="gap:12px">
+          <div><label>Sector</label><select name="sector" required><option value=""></option>{% for v, t in sectores %}<option {% if v == perfil.sector %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+          <div><label>Tamaño</label><select name="tamano">{% for v, t in tamanos %}<option {% if v == ev.usuario.organizacion.tamano %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+          <div><label>Usuarios previstos</label><input name="usuarios" value="{{ perfil.usuarios }}"></div>
+          <div><label>Soporte</label><select name="soporte"><option {% if perfil.soporte == "Interno" %}selected{% endif %}>Interno</option><option {% if perfil.soporte == "Externo" %}selected{% endif %}>Externo</option></select></div>
+        </div>
+        <label style="margin-top:12px">Necesidad</label><input name="necesidad" value="{{ perfil.necesidad }}">
+      </div>
+      <div class="tarjeta aviso-is">
+        <div class="etiqueta">Importancia sugerida</div>
+        <p class="mini" style="color:var(--texto)">{% if is_sector %}Se usará la IS calculada con expertos del <b>sector {{ perfil.sector|lower }}</b>.{% else %}Se usará la IS general de la guía, porque aún no hay respuestas de expertos de este sector.{% endif %} Es la versión vigente y se actualiza sola cuando entran datos nuevos.</p>
+      </div>
+      <button class="boton" style="width:100%;justify-content:center;margin-top:16px">Continuar a los factores →</button>
+    </form>
+    {% else %}
+    <div class="tarjeta"><h3>Perfil detectado</h3><p class="mini">Aparecerá aquí cuando respondas las cuatro preguntas del asistente.</p></div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

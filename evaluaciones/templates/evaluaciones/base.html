@@ -1,0 +1,37 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}GUIOS PRO 2.0{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'evaluaciones/css/app.css' %}">
+</head>
+<body>
+<header class="barra"><div>
+  <a class="marca" href="{% url 'inicio' %}"><b>G</b>GUIOS PRO <span>2.0</span></a>
+  {% if ev and paso %}
+    <span class="evaluando">Evaluando <b>{{ ev.software }}</b></span>
+    <span class="chip">{{ ev.usuario.nombre }} · {{ ev.usuario.organizacion.nombre }}</span>
+  {% else %}
+    <nav class="menu">
+      {% with n=request.resolver_match.url_name %}
+      <a href="{% url 'inicio' %}" class="{% if n == 'inicio' %}activo{% endif %}">Nueva evaluación</a>
+      <a href="{% url 'historial' %}" class="{% if n == 'historial' or n == 'comparar' %}activo{% endif %}">Historial</a>
+      <a href="{% url 'datos' %}" class="{% if n == 'datos' %}activo{% endif %}">Datos de la guía</a>
+      {% endwith %}
+    </nav>
+  {% endif %}
+</div></header>
+<main>
+  {% if paso %}
+  <div class="pasos">
+    {% include "evaluaciones/_pasos.html" %}
+  </div>
+  {% endif %}
+  {% for m in messages %}<div class="mensaje {{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+{% csrf_token %}
+<script type="module" src="{% static 'evaluaciones/js/app.js' %}"></script>
+</body>
+</html>

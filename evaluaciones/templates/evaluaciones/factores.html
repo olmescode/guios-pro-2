@@ -1,0 +1,48 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<div class="columnas">
+  <section class="tarjeta" style="padding:0">
+    <div style="padding:24px 24px 14px;display:flex;justify-content:space-between;gap:20px">
+      <div><h1 style="font-size:24px">Pasos 1 y 2: ¿qué tan importante es cada factor?</h1>
+        <p class="sub">Marca la importancia para tu organización y elige el alcance. La Importancia Relativa se calcula sola.</p></div>
+      <span><span class="pildora Fortaleza"><span id="relevantes">{{ relevantes }}</span> de {{ filas|length }} factores relevantes</span></span>
+    </div>
+    <table>
+      <tr><th style="padding-left:24px">Factor</th><th>Imp. sugerida</th><th>Tu importancia (ID)</th><th>Imp. relativa</th><th>Alcance</th><th></th></tr>
+      {% regroup filas by factor.dimension.nombre as dimensiones %}
+      {% for d in dimensiones %}
+      <tr class="grupo"><td colspan="6" style="padding-left:24px">{{ d.grouper }}</td></tr>
+      {% for f in d.list %}
+      <tr data-ef="{{ f.pk }}" data-url="{% url 'guardar_factor' f.pk %}" data-nombre="{{ f.factor.nombre }}" data-ie="{{ f.importancia.valor_ie }}"
+          data-il="{{ f.importancia.valor_il }}" data-is="{{ f.importancia.valor_is }}" data-id="{{ f.imp_decisor }}" data-ir="{{ f.imp_relativa }}" {% if forloop.first and forloop.parentloop.first %}class="marcado"{% endif %}>
+        <td style="padding-left:24px"><b style="font-weight:500">{{ f.factor.nombre }}</b></td>
+        <td><span class="pildora">{{ f.importancia.get_valor_is_display }}</span></td>
+        <td><span class="segmento">{% for v, t in niveles %}<button type="button" value="{{ v }}" title="{{ t }}" class="{% if v == f.imp_decisor %}activo{% endif %}">{% if v == 4 %}Fund.{% else %}{{ t|slice:":3" }}.{% endif %}</button>{% endfor %}</span></td>
+        <td><span class="pildora ir n{{ f.imp_relativa }}">{{ f.get_imp_relativa_display }}</span></td>
+        <td><select><option {% if f.alcance == "Interno" %}selected{% endif %}>Interno</option><option {% if f.alcance == "Externo" %}selected{% endif %}>Externo</option></select></td>
+        <td><a href="#" class="ver-porque">¿Por qué?</a></td>
+      </tr>
+      {% endfor %}{% endfor %}
+    </table>
+    <div class="acciones" style="padding:0 24px 24px"><span class="nota">Cambios guardados automáticamente</span>
+      <a class="boton" href="{% url 'subfactores' ev.pk %}">Continuar a subfactores →</a></div>
+  </section>
+  <aside class="lateral">
+    {% with f=filas.0 %}
+    <div class="tarjeta porque" id="porque">
+      <div class="etiqueta">¿Por qué?</div>
+      <h3 style="font-size:19px;margin-top:4px">{{ f.factor.nombre }}</h3>
+      <dl>
+        <dt>Expertos (IE)</dt><dd data-campo="ie">{{ f.importancia.valor_ie }}</dd>
+        <dt>Literatura (IL)</dt><dd data-campo="il">{{ f.importancia.get_valor_il_display }}</dd><hr>
+        <dt>Sugerida (IS)</dt><dd data-campo="is">{{ f.importancia.get_valor_is_display }}</dd>
+        <dt>Tu importancia (ID)</dt><dd data-campo="id">{{ f.get_imp_decisor_display }}</dd><hr>
+        <dt>Relativa (IR)</dt><dd data-campo="ir" style="color:var(--azul)">{{ f.get_imp_relativa_display }}</dd>
+      </dl>
+      <p class="mini">La IR sale de cruzar la IS con tu importancia en la matriz de la guía: el promedio de las dos, redondeado hacia abajo. Si sale Irrelevante, el factor ya no se evalúa.</p>
+    </div>
+    {% endwith %}
+    <div class="tarjeta"><h3>Alcance</h3><p class="mini">Puedes cambiar el alcance de cualquier factor. Viene marcado el valor de la guía como sugerencia: interno define fortaleza o debilidad, externo define oportunidad o amenaza.</p></div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<div class="columnas" style="grid-template-columns:1fr 380px">
+  <section class="tarjeta" style="padding:0">
+    <div style="padding:24px 24px 12px"><h1 style="font-size:24px">Datos de la guía</h1>
+      <p class="sub">Importancia Sugerida vigente de cada factor. Se recalcula sola con las fórmulas de la tesis y guarda los valores anteriores.</p></div>
+    <table>
+      <tr><th style="padding-left:24px">Factor</th><th>NS</th><th>Citas</th><th>IE</th><th>IL</th><th>IS</th><th>Cálculos</th></tr>
+      {% regroup filas by 0.dimension.nombre as dimensiones %}
+      {% for d in dimensiones %}<tr class="grupo"><td colspan="7" style="padding-left:24px">{{ d.grouper }}</td></tr>
+        {% for f, imp, n in d.list %}<tr><td style="padding-left:24px">{{ f.nombre }}</td><td class="num">{{ f.ns }}</td><td class="num">{{ f.tc }}</td><td class="num">{{ imp.valor_ie }}</td>
+          <td>{{ imp.valor_il }}</td><td><span class="pildora n{{ imp.valor_is }}">{{ imp.get_valor_is_display }}</span></td><td class="mini">{{ n }}</td></tr>{% endfor %}
+      {% endfor %}
+    </table>
+    <p class="mini" style="padding:12px 24px 20px">NS: subfactores · IE: importancia de los expertos ({{ resumen.respuestas }} expertos) · IL: importancia de la literatura (cuartil de citas por subfactor) · IS: cruce de IE e IL.</p>
+  </section>
+  <aside class="lateral">
+    <form class="tarjeta" method="post">{% csrf_token %}<input type="hidden" name="accion" value="experto">
+      <h3>Nueva respuesta de experto</h3><p class="mini">Calificación de 1 a 4 que da un experto a un subfactor.</p>
+      <label>Experto</label><input name="experto" required>
+      <div class="rejilla" style="gap:12px;margin-top:12px">
+        <div><label>Sector</label><select name="sector">{% for v, t in sectores %}<option>{{ t }}</option>{% endfor %}</select></div>
+        <div><label>Calificación</label><select name="valor">{% for v, t in niveles %}<option value="{{ v }}" {% if v == 3 %}selected{% endif %}>{{ v }} {{ t }}</option>{% endfor %}</select></div>
+      </div>
+      <label style="margin-top:12px">Subfactor</label>{% include "evaluaciones/_subfactores.html" %}
+      <button class="boton" style="margin-top:16px">Guardar y recalcular</button>
+    </form>
+    <form class="tarjeta" method="post">{% csrf_token %}<input type="hidden" name="accion" value="citas">
+      <h3>Citas nuevas en la literatura</h3><p class="mini">Número de artículos nuevos que mencionan el subfactor.</p>
+      <label>Subfactor</label>{% include "evaluaciones/_subfactores.html" %}
+      <label style="margin-top:12px">Citas nuevas</label><input type="number" name="citas" min="1" value="1" required>
+      <button class="boton" style="margin-top:16px">Guardar y recalcular</button>
+    </form>
+    {% if ultimas %}<div class="tarjeta"><h3>Últimas respuestas</h3><ul class="lista">{% for r in ultimas %}<li><span><b style="font-weight:500">{{ r.experto }}</b> · {{ r.sector }} · {{ r.get_valor_display }}<small>{{ r.subfactor.factor.nombre }} · {{ r.fecha|date:"d/m/Y H:i" }}</small></span></li>{% endfor %}</ul></div>{% endif %}
+  </aside>
+</div>
+{% endblock %}

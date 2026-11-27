@@ -1,0 +1,25 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<section class="tarjeta">
+  <h1 style="font-size:24px">Historial de evaluaciones</h1>
+  <p class="sub" style="margin-bottom:18px">Cada evaluación queda guardada con quién la hizo, cuándo y qué resultado salió.</p>
+  <form class="filtros">
+    <div><label>Software</label><input name="software" value="{{ f.software }}"></div>
+    <div><label>Resultado</label><select name="resultado"><option value="">Todos</option>{% for r in "ABC" %}<option {% if f.resultado == r %}selected{% endif %}>{{ r }}</option>{% endfor %}</select></div>
+    <div><label>Desde</label><input type="date" name="desde" value="{{ f.desde }}"></div>
+    <div><label>Hasta</label><input type="date" name="hasta" value="{{ f.hasta }}"></div>
+    <button class="boton claro">Filtrar</button>
+  </form>
+  <form action="{% url 'comparar' %}" id="comparar">
+    <table><tr><th></th><th>Fecha</th><th>Software</th><th>Licencia</th><th>Decisor</th><th>Organización</th><th>Resultado</th><th></th></tr>
+      {% for ev, paso in lista %}
+      <tr><td>{% if ev.recomendacion %}<input type="checkbox" value="{{ ev.pk }}" style="width:auto">{% endif %}</td><td>{{ ev.fecha|date:"d/m/Y H:i" }}</td><td><b style="font-weight:500">{{ ev.software }}</b></td><td>{{ ev.software.tipo_licencia }}</td>
+        <td>{{ ev.usuario.nombre }}<br><span class="mini">{{ ev.usuario.cargo }}</span></td><td>{{ ev.usuario.organizacion.nombre }}</td>
+        <td>{% if ev.recomendacion %}<span class="letra {{ ev.recomendacion }}" style="width:30px;height:30px">{{ ev.recomendacion }}</span>{% else %}<span class="pildora">En curso</span>{% endif %}</td>
+        <td><a href="{% url paso ev.pk %}">{% if ev.recomendacion %}Ver{% else %}Continuar{% endif %}</a></td></tr>
+      {% empty %}<tr><td colspan="8" class="vacio">No hay evaluaciones con esos filtros.</td></tr>{% endfor %}
+    </table>
+    <div class="acciones"><span class="nota">Marca dos evaluaciones terminadas para compararlas.</span><button class="boton" id="btn-comparar" disabled>Comparar seleccionadas</button></div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<section class="tarjeta">
+  <h1 style="font-size:24px">Comparación de evaluaciones</h1>
+  <p class="sub" style="margin-bottom:18px">Lo que cambió entre las dos evaluaciones, factor por factor.</p>
+  <table>
+    <tr><th></th><th colspan="3">{{ a.software }} · {{ a.fecha|date:"d/m/Y" }} · {{ a.usuario.nombre }}</th><th colspan="3">{{ b.software }} · {{ b.fecha|date:"d/m/Y" }} · {{ b.usuario.nombre }}</th></tr>
+    <tr><td><b>Recomendación</b></td><td colspan="3"><span class="letra {{ a.recomendacion }}" style="width:30px;height:30px">{{ a.recomendacion }}</span></td><td colspan="3"><span class="letra {{ b.recomendacion }}" style="width:30px;height:30px">{{ b.recomendacion }}</span></td></tr>
+    <tr><th>Factor</th><th>IR</th><th>PM</th><th>FODA</th><th>IR</th><th>PM</th><th>FODA</th></tr>
+    {% for factor, x, y in filas %}
+    <tr {% if x.foda != y.foda %}class="marcado"{% endif %}><td>{{ factor.nombre }}</td>
+      <td>{{ x.get_imp_relativa_display }}</td><td class="num">{% if x.relevante %}{{ x.ponderacion_media|floatformat:2 }}{% else %}–{% endif %}</td><td>{% if x.relevante %}<span class="pildora {{ x.foda }}">{{ x.foda }}</span>{% endif %}</td>
+      <td>{{ y.get_imp_relativa_display }}</td><td class="num">{% if y.relevante %}{{ y.ponderacion_media|floatformat:2 }}{% else %}–{% endif %}</td><td>{% if y.relevante %}<span class="pildora {{ y.foda }}">{{ y.foda }}</span>{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+  <p class="mini" style="margin-top:14px">Las filas resaltadas son los factores cuya clasificación FODA cambió.</p>
+</section>
+{% endblock %}

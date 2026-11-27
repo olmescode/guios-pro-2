@@ -1,0 +1,19 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Informe GUIOS - {{ ev.software }}</title>
+<link rel="stylesheet" href="{% static 'evaluaciones/css/app.css' %}">
+<style>body{background:#fff}main{max-width:900px}.veredicto{flex-wrap:wrap}.contadores{grid-template-columns:repeat(4,1fr);width:100%}h2{font-size:17px;margin:26px 0 10px}@media print{.no-imprimir{display:none}@page{margin:16mm}}</style></head>
+<body onload="window.print()"><main>
+  <p class="no-imprimir mini">Elige «Guardar como PDF» en la ventana de impresión.</p>
+  <div class="marca" style="margin-bottom:6px"><b>G</b>GUIOS PRO <span>2.0</span></div>
+  <p class="mini">Informe de evaluación n.° {{ ev.pk }} · {{ ev.fecha|date:"d/m/Y H:i" }}</p>
+  <table><tr><td><b>Software</b></td><td>{{ ev.software }} ({{ ev.software.tipo_licencia }})</td><td><b>Decisor</b></td><td>{{ ev.usuario.nombre }}, {{ ev.usuario.cargo }}</td></tr>
+    <tr><td><b>Organización</b></td><td>{{ ev.usuario.organizacion.nombre }}</td><td><b>Sector / tamaño</b></td><td>{{ ev.usuario.organizacion.sector }} · {{ ev.usuario.organizacion.tamano }}</td></tr></table>
+  <h2>Recomendación</h2>{% include "evaluaciones/_veredicto.html" %}
+  <h2>Resultado por factor</h2>
+  <table><tr><th>Factor</th><th>IS</th><th>ID</th><th>IR</th><th>Alcance</th><th>PM</th><th>FODA</th></tr>
+    {% for f in filas %}<tr><td>{{ f.factor.nombre }}</td><td>{{ f.importancia.get_valor_is_display }}</td><td>{{ f.get_imp_decisor_display }}</td><td>{{ f.get_imp_relativa_display }}</td><td>{{ f.alcance }}</td>
+      <td class="num">{% if f.relevante %}{{ f.ponderacion_media|floatformat:2 }}{% else %}–{% endif %}</td><td>{% if f.relevante %}{{ f.foda }}{% else %}No relevante{% endif %}</td></tr>{% endfor %}</table>
+  <h2>Explicación y plan de acción ({{ ev.get_fuente_ia_display|lower }})</h2>
+  <p>{{ ev.explicacion_ia }}</p>
+  <table>{% for ef in negativos %}<tr><td style="width:30%"><b>{{ ef.factor.nombre }}</b><br><span class="mini">{{ ef.foda }} · {{ ef.get_imp_relativa_display }}</span></td><td>{{ ef.accion_ia }}</td></tr>{% endfor %}</table>
+</main></body></html>

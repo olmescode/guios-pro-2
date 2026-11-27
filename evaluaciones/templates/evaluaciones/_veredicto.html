@@ -1,0 +1,7 @@
+<div class="veredicto">
+  <span class="letra {{ ev.recomendacion }}">{{ ev.recomendacion }}</span>
+  <div><div class="etiqueta" style="color:inherit" >Recomendación</div>
+    <h1>{{ ev.get_recomendacion_display }}</h1>
+    <p class="sub">{% if ev.recomendacion == "A" %}Todos los factores relevantes salieron como fortaleza u oportunidad.{% elif ev.recomendacion == "B" %}Hay debilidades o amenazas, pero solo en factores opcionales.{% else %}Hay debilidades o amenazas en factores que marcaste como importantes o fundamentales.{% endif %} Todos los factores relevantes fueron evaluados.</p></div>
+  <div class="contadores">{% for clave, titulo, regla, lista in foda %}<div class="{{ clave }}"><b>{{ lista|length }}</b>{{ titulo }}</div>{% endfor %}</div>
+</div>

@@ -1,0 +1,1 @@
+<select name="subfactor">{% for f in factores %}<optgroup label="{{ f.nombre }}">{% for s in f.subfactores.all %}<option value="{{ s.pk }}">{{ s.descripcion|truncatechars:70 }}</option>{% endfor %}</optgroup>{% endfor %}</select>

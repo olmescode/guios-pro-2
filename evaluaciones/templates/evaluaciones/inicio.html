@@ -1,0 +1,46 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<div class="columnas">
+  <form class="tarjeta" method="post">{% csrf_token %}
+    <div class="etiqueta">Nueva evaluación</div>
+    <h1 style="font-size:32px;margin-top:6px">Empecemos con unos datos básicos</h1>
+    <p class="sub">No necesitas contraseña. Con tu nombre y organización la evaluación queda guardada en el historial.</p>
+    <h2 class="seccion">¿Quién evalúa?</h2>
+    <div class="rejilla">
+      <div><label for="nombre">Nombre</label><input id="nombre" name="nombre" required></div>
+      <div><label for="cargo">Cargo</label><input id="cargo" name="cargo" required></div>
+      <div><label for="organizacion">Organización</label><input id="organizacion" name="organizacion" required></div>
+      <div><label for="tamano">Tamaño</label>
+        <select id="tamano" name="tamano">{% for v, t in tamanos %}<option {% if v == "Grande" %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+    </div>
+    <h2 class="seccion">¿Qué software vas a evaluar?</h2>
+    <div class="rejilla">
+      <div><label for="software">Nombre del software</label><input id="software" name="software" required></div>
+      <div><label for="version">Versión</label><input id="version" name="version"></div>
+    </div>
+    <label style="margin-top:18px">Tipo de licencia</label>
+    <div class="opciones">
+      <label><input type="radio" name="licencia" value="Libre" checked> Libre</label>
+      <label><input type="radio" name="licencia" value="Privativo"> Privativo</label>
+    </div>
+    <div class="acciones"><button class="boton">Iniciar evaluación →</button></div>
+  </form>
+  <aside class="lateral">
+    <div class="tarjeta">
+      <h3 style="display:flex;justify-content:space-between">Evaluaciones recientes <a href="{% url 'historial' %}" style="font-size:14px">Ver historial</a></h3>
+      <ul class="lista">
+        {% for e in recientes %}
+        <li><span class="letra {{ e.recomendacion }}">{{ e.recomendacion }}</span>
+          <a href="{% url 'resultado' e.pk %}" style="color:inherit;text-decoration:none"><b>{{ e.software }}</b><small>{{ e.usuario.cargo }} · {{ e.fecha|date:"d/m/Y" }}</small></a></li>
+        {% empty %}<li class="mini">Todavía no hay evaluaciones terminadas.</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="tarjeta">
+      <h3>Datos de la guía</h3>
+      <p class="mini">La Importancia Sugerida se recalcula sola cuando se ingresan respuestas de expertos o citas nuevas.</p>
+      <div class="pildoras"><span class="pildora">{{ resumen.factores }} factores</span><span class="pildora">{{ resumen.subfactores }} subfactores</span><span class="pildora">{{ resumen.respuestas }} expertos</span></div>
+      <a class="boton claro" href="{% url 'datos' %}">Ingresar datos nuevos</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

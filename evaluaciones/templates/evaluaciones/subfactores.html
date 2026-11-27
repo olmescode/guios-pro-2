@@ -1,0 +1,30 @@
+{% extends "evaluaciones/base.html" %}
+{% block contenido %}
+<section class="tarjeta" style="display:flex;justify-content:space-between;align-items:center;gap:20px">
+  <div><h1 style="font-size:24px">Pasos 3 y 4: ¿cumple cada requisito?</h1>
+    <p class="sub">Todos los factores relevantes en una sola pantalla. Cada respuesta se guarda al instante.</p></div>
+  <div class="progreso"><b>Progreso</b><span style="float:right"><span id="hechos">{{ hechos }}</span> / {{ total }} subfactores</span>
+    <div><span id="barra" style="width:{% widthratio hechos total 100 %}%"></span></div></div>
+</section>
+{% for ef, filas, respondidos in bloques %}
+<details data-ef="{{ ef.pk }}" data-url="{% url 'guardar_subfactor' ef.pk %}" {% if ef.pk == abierto %}open{% endif %}>
+  <summary><h3>{{ ef.factor.nombre }}</h3><span class="pildora n{{ ef.imp_relativa }}">IR {{ ef.get_imp_relativa_display }}</span><span class="pildora">{{ ef.alcance }}</span>
+    <span class="mini"><span class="respondidos">{{ respondidos }}</span> de {{ filas|length }}</span>
+    <span class="derecha">Ponderación media <b class="num pm" style="font-size:16px;color:var(--texto)">{% if ef.ponderacion_media %}{{ ef.ponderacion_media|floatformat:2 }}{% else %}–{% endif %}</b>
+      <span class="pildora estado {{ ef.foda }}">{{ ef.foda|default:"Pendiente" }}</span></span></summary>
+  {% for s, valor in filas %}
+  <div class="sf"><span>{{ s.descripcion }}</span>
+    <span class="segmento">
+      <label><input type="radio" name="s{{ s.pk }}" value="1" data-sub="{{ s.pk }}" {% if valor == 1 %}checked{% endif %}>No cumple</label>
+      <label><input type="radio" name="s{{ s.pk }}" value="2" data-sub="{{ s.pk }}" {% if valor == 2 %}checked{% endif %}>No sé</label>
+      <label><input type="radio" name="s{{ s.pk }}" value="3" data-sub="{{ s.pk }}" {% if valor == 3 %}checked{% endif %}>Parcial</label>
+      <label><input type="radio" name="s{{ s.pk }}" value="4" data-sub="{{ s.pk }}" {% if valor == 4 %}checked{% endif %}>Cumple</label>
+    </span></div>
+  {% endfor %}
+</details>
+{% empty %}<div class="tarjeta vacio">No quedó ningún factor relevante. Vuelve al paso anterior y revisa las importancias.</div>
+{% endfor %}
+<div class="acciones"><span class="nota">El resultado se habilita cuando todos los factores relevantes estén evaluados.</span>
+  <a class="boton claro" href="{% url 'factores' ev.pk %}">← Factores</a>
+  <button class="boton" id="ver-resultado" data-url="{% url 'resultado' ev.pk %}" {% if hechos < total or not total %}disabled{% endif %}>Ver resultado →</button></div>
+{% endblock %}
